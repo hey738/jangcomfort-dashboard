@@ -107,7 +107,7 @@ all_regions = df['행정동'].dropna().unique().tolist()
 target_regions = st.sidebar.multiselect(
     "타겟 지역 선택",
     options=all_regions,
-    default=['월곶동', '배곧1동', '배곧2동']
+    default=[]
 )
 
 # 데이터 필터링
