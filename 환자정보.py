@@ -388,7 +388,7 @@ st.subheader("요일×시간대 내원 패턴")
 filtered['요일'] = filtered['진료일자'].dt.day_name()
 heat = filtered.groupby(['요일', '진료시간대']).size().reset_index(name='count')
 heat_chart = alt.Chart(heat).mark_rect().encode(
-    x=alt.X('진료시간대:O', title="시간대", axis=alt.Axis(labelAngle=0), scale=alt.Scale(domain=['08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18'])),
+    x=alt.X('진료시간대:O', title="시간대", axis=alt.Axis(labelAngle=0)),
     y=alt.Y('요일:O', sort=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']),
     color=alt.Color('count:Q', scale=alt.Scale(scheme='blues'), title='내원수')
 )
@@ -402,5 +402,6 @@ filtered['y'].replace("", pd.NA, inplace=True)
 data = list(filtered.dropna(subset=['y','x'])[['y','x']].itertuples(index=False, name=None))
 FastMarkerCluster(data).add_to(m)
 folium_static(m, width=800, height=600)
+
 
 
