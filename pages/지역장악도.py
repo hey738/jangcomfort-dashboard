@@ -122,17 +122,28 @@ with st.sidebar.expander("활성 환자 기간", True):
 
 with st.sidebar.expander("지역 선택", True):
     provinces = ["전체"] + pop_df.index.get_level_values(0).unique().tolist()
-    province = st.selectbox("시/도", provinces, index=0)
-    if province=="전체":
-        cities=["전체"]
+    default_province = "인천광역시"
+    province_index = provinces.index(default_province) if default_province in provinces else 0
+    province = st.selectbox("시/도", provinces, index=province_index)
+
+    if province == "전체":
+        cities = ["전체"]
     else:
         cities = ["전체"] + pop_df.loc[province].index.get_level_values(0).unique().tolist()
-    city = st.selectbox("시/군/구", cities)
-    if province=="전체" or city=="전체":
-        dongs=["전체"]
+
+    default_city = "미추홀구"
+    city_index = cities.index(default_city) if default_city in cities else 0
+    city = st.selectbox("시/군/구", cities, index=city_index)
+
+    if province == "전체" or city == "전체":
+        dongs = ["전체"]
     else:
-        dongs = ["전체"] + pop_df.loc[(province,city)].index.get_level_values(0).unique().tolist()
-    dong = st.selectbox("행정동", dongs)
+        dongs = ["전체"] + pop_df.loc[(province, city)].index.get_level_values(0).unique().tolist()
+
+    default_dong = "도화2.3동"
+    dong_index = dongs.index(default_dong) if default_dong in dongs else 0
+    dong = st.selectbox("행정동", dongs, index=dong_index)
+
 
 # 활성 환자 데이터
 active = patient_df[patient_df["진료일자"]>=cutoff].copy()
