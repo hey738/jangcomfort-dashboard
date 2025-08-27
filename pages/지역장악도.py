@@ -120,43 +120,19 @@ with st.sidebar.expander("활성 환자 기간", True):
     cutoff = datetime.now() - timedelta(days=30*months)
     st.write(f"{cutoff.date()} 이후")
 
-# 0) 최초 1회만 기본값 주입
-if "province" not in st.session_state:
-    st.session_state.province = "서울특별시"
-if "city" not in st.session_state:
-    st.session_state.city = "강남구"
-if "dong" not in st.session_state:
-    st.session_state.dong = "역삼동"
-
 with st.sidebar.expander("지역 선택", True):
     provinces = ["전체"] + pop_df.index.get_level_values(0).unique().tolist()
-
-    # 1) 세션 값이 옵션에 없으면(데이터 변동 등) 안전하게 초기화
-    if st.session_state.province not in provinces:
-        st.session_state.province = "전체"
-
-    # 2) 위젯에는 index를 주지 말고 key만 줌 (세션 값이 그대로 표시됨)
-    province = st.selectbox("시/도", provinces, key="province")
-
-    # 상위 변경 시 하위 리셋 콜백 쓰는 경우,
-    # on_change 안에서 st.session_state.city/dong = "전체" 만 세팅하고
-    # selectbox에는 index를 주지 않습니다.
-
-    if province == "전체":
-        cities = ["전체"]
+    province = st.selectbox("시/도", provinces, index=0)
+    if province=="전체":
+        cities=["전체"]
     else:
         cities = ["전체"] + pop_df.loc[province].index.get_level_values(0).unique().tolist()
-    if st.session_state.city not in cities:
-        st.session_state.city = "전체"
-    city = st.selectbox("시/군/구", cities, key="city")
-
-    if province == "전체" or city == "전체":
-        dongs = ["전체"]
+    city = st.selectbox("시/군/구", cities)
+    if province=="전체" or city=="전체":
+        dongs=["전체"]
     else:
-        dongs = ["전체"] + pop_df.loc[(province, city)].index.get_level_values(0).unique().tolist()
-    if st.session_state.dong not in dongs:
-        st.session_state.dong = "전체"
-    dong = st.selectbox("행정동", dongs, key="dong")
+        dongs = ["전체"] + pop_df.loc[(province,city)].index.get_level_values(0).unique().tolist()
+    dong = st.selectbox("행정동", dongs)
 
 # 활성 환자 데이터
 active = patient_df[patient_df["진료일자"]>=cutoff].copy()
