@@ -120,29 +120,49 @@ with st.sidebar.expander("활성 환자 기간", True):
     cutoff = datetime.now() - timedelta(days=30*months)
     st.write(f"{cutoff.date()} 이후")
 
+# 1) 처음 1회만 기본값 주입
+if "region_init" not in st.session_state:
+    st.session_state.region_init = True
+    st.session_state.province = "인천광역시"  # 초기 기본값
+    st.session_state.city = "미추홀구"
+    st.session_state.dong = "도화2.3동"
+
+# 2) 상위가 바뀌면 하위 리셋
+def on_change_province():
+    st.session_state.city = "전체"
+    st.session_state.dong = "전체"
+
+def on_change_city():
+    st.session_state.dong = "전체"
+
 with st.sidebar.expander("지역 선택", True):
     provinces = ["전체"] + pop_df.index.get_level_values(0).unique().tolist()
-    default_province = "인천광역시"
-    province_index = provinces.index(default_province) if default_province in provinces else 0
-    province = st.selectbox("시/도", provinces, index=province_index)
 
+    # 3) selectbox: key를 주면 이후부터는 key의 값이 index보다 우선됨(=초기 1회만 index 적용)
+    prov_index = provinces.index(st.session_state.province) if st.session_state.province in provinces else 0
+    province = st.selectbox(
+        "시/도", provinces, index=prov_index, key="province", on_change=on_change_province
+    )
+
+    # 현재 province에 맞춰 시/군/구 목록 구성
     if province == "전체":
         cities = ["전체"]
     else:
         cities = ["전체"] + pop_df.loc[province].index.get_level_values(0).unique().tolist()
 
-    default_city = "미추홀구"
-    city_index = cities.index(default_city) if default_city in cities else 0
-    city = st.selectbox("시/군/구", cities, index=city_index)
+    city_index = cities.index(st.session_state.city) if st.session_state.city in cities else 0
+    city = st.selectbox(
+        "시/군/구", cities, index=city_index, key="city", on_change=on_change_city
+    )
 
+    # 현재 province, city에 맞춰 행정동 목록 구성
     if province == "전체" or city == "전체":
         dongs = ["전체"]
     else:
         dongs = ["전체"] + pop_df.loc[(province, city)].index.get_level_values(0).unique().tolist()
 
-    default_dong = "도화2.3동"
-    dong_index = dongs.index(default_dong) if default_dong in dongs else 0
-    dong = st.selectbox("행정동", dongs, index=dong_index)
+    dong_index = dongs.index(st.session_state.dong) if st.session_state.dong in dongs else 0
+    dong = st.selectbox("행정동", dongs, index=dong_index, key="dong")
 
 
 # 활성 환자 데이터
