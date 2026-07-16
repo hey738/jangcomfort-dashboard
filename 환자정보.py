@@ -282,7 +282,7 @@ final_comp_chart = comp_area + comp_hover
 # 1) 선택 기간 월별 집계
 curr_monthly = (
     filtered
-    .groupby(pd.Grouper(key='진료일자', freq='M'))
+    .groupby(pd.Grouper(key='진료일자', freq='ME'))
     .size()
     .reset_index(name='환자수')
 )
@@ -293,7 +293,7 @@ ly_filtered = df[
 ]
 ly_monthly = (
     ly_filtered
-    .groupby(pd.Grouper(key='진료일자', freq='M'))
+    .groupby(pd.Grouper(key='진료일자', freq='ME'))
     .size()
     .reset_index(name='환자수')
 )
